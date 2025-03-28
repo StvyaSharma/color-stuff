@@ -1,4 +1,3 @@
-// @ts-nocheck
 import chroma, { Color } from "chroma-js";
 
 /**
@@ -182,7 +181,7 @@ const distances = (
   const distances: number[] = [];
   // Convert colors to simulated color space if needed
   const convertedColors = colorArray.map((c) =>
-    chroma(brettelFunctions[visionSpace](c.rgb()) as [number, number, number]),
+    chroma(brettelFunctions[visionSpace](c.rgb()) as [number, number, number])
   );
 
   // Calculate distances between all pairs
@@ -259,7 +258,7 @@ const averageDistanceFromColors = (
   givenColors: Color[],
 ): number => {
   const distances = testColors.map((c) =>
-    distance(c, getClosestColor(c, givenColors)),
+    distance(c, getClosestColor(c, givenColors))
   );
   return average(distances);
 };
@@ -277,7 +276,7 @@ const maxDistanceFromColors = (
   givenColors: Color[],
 ): number => {
   const distances = testColors.map((c) =>
-    distance(c, getClosestColor(c, givenColors)),
+    distance(c, getClosestColor(c, givenColors))
   );
   return Math.max(...distances);
 };
@@ -295,7 +294,7 @@ const minDistanceFromColors = (
   givenColors: Color[],
 ): number => {
   const distances = testColors.map((c) =>
-    distance(c, getClosestColor(c, givenColors)),
+    distance(c, getClosestColor(c, givenColors))
   );
   return Math.min(...distances);
 };
@@ -374,33 +373,75 @@ var sRGB_to_linearRGB_Lookup: number[] = Array(256);
 const brettel_params: { [key: string]: any } = {
   protan: {
     rgbCvdFromRgb_1: [
-      0.1451, 1.20165, -0.34675, 0.10447, 0.85316, 0.04237, 0.00429, -0.00603,
+      0.1451,
+      1.20165,
+      -0.34675,
+      0.10447,
+      0.85316,
+      0.04237,
+      0.00429,
+      -0.00603,
       1.00174,
     ],
     rgbCvdFromRgb_2: [
-      0.14115, 1.16782, -0.30897, 0.10495, 0.8573, 0.03776, 0.00431, -0.00586,
+      0.14115,
+      1.16782,
+      -0.30897,
+      0.10495,
+      0.8573,
+      0.03776,
+      0.00431,
+      -0.00586,
       1.00155,
     ],
     separationPlaneNormal: [0.00048, 0.00416, -0.00464],
   },
   deutan: {
     rgbCvdFromRgb_1: [
-      0.36198, 0.86755, -0.22953, 0.26099, 0.64512, 0.09389, -0.01975, 0.02686,
+      0.36198,
+      0.86755,
+      -0.22953,
+      0.26099,
+      0.64512,
+      0.09389,
+      -0.01975,
+      0.02686,
       0.99289,
     ],
     rgbCvdFromRgb_2: [
-      0.37009, 0.8854, -0.25549, 0.25767, 0.63782, 0.10451, -0.0195, 0.02741,
+      0.37009,
+      0.8854,
+      -0.25549,
+      0.25767,
+      0.63782,
+      0.10451,
+      -0.0195,
+      0.02741,
       0.99209,
     ],
     separationPlaneNormal: [-0.00293, -0.00645, 0.00938],
   },
   tritan: {
     rgbCvdFromRgb_1: [
-      1.01354, 0.14268, -0.15622, -0.01181, 0.87561, 0.13619, 0.07707, 0.81208,
+      1.01354,
+      0.14268,
+      -0.15622,
+      -0.01181,
+      0.87561,
+      0.13619,
+      0.07707,
+      0.81208,
       0.11085,
     ],
     rgbCvdFromRgb_2: [
-      0.93337, 0.19999, -0.13336, 0.05809, 0.82565, 0.11626, -0.37923, 1.13825,
+      0.93337,
+      0.19999,
+      -0.13336,
+      0.05809,
+      0.82565,
+      0.11626,
+      -0.37923,
+      1.13825,
       0.24098,
     ],
     separationPlaneNormal: [0.0396, -0.02831, -0.01129],
@@ -433,25 +474,22 @@ function brettel(srgb: number[], t: string, severity: number): number[] {
   const rgbCvdFromRgb_2 = params["rgbCvdFromRgb_2"];
 
   // Determine which transformation matrix to use based on the separation plane
-  const dotWithSepPlane =
-    rgb[0] * separationPlaneNormal[0] +
+  const dotWithSepPlane = rgb[0] * separationPlaneNormal[0] +
     rgb[1] * separationPlaneNormal[1] +
     rgb[2] * separationPlaneNormal[2];
-  const rgbCvdFromRgb =
-    dotWithSepPlane >= 0 ? rgbCvdFromRgb_1 : rgbCvdFromRgb_2;
+  const rgbCvdFromRgb = dotWithSepPlane >= 0
+    ? rgbCvdFromRgb_1
+    : rgbCvdFromRgb_2;
 
   // Transform the color
   const rgb_cvd = Array(3);
-  rgb_cvd[0] =
-    rgbCvdFromRgb[0] * rgb[0] +
+  rgb_cvd[0] = rgbCvdFromRgb[0] * rgb[0] +
     rgbCvdFromRgb[1] * rgb[1] +
     rgbCvdFromRgb[2] * rgb[2];
-  rgb_cvd[1] =
-    rgbCvdFromRgb[3] * rgb[0] +
+  rgb_cvd[1] = rgbCvdFromRgb[3] * rgb[0] +
     rgbCvdFromRgb[4] * rgb[1] +
     rgbCvdFromRgb[5] * rgb[2];
-  rgb_cvd[2] =
-    rgbCvdFromRgb[6] * rgb[0] +
+  rgb_cvd[2] = rgbCvdFromRgb[6] * rgb[0] +
     rgbCvdFromRgb[7] * rgb[1] +
     rgbCvdFromRgb[8] * rgb[2];
 
@@ -529,9 +567,9 @@ const cost = (state: Color[], config: ColorConfiguration): number => {
   const rangeScore = range(normalDistances);
   const targetScore = config.targetColors.length
     ? averageDistanceFromColors(
-        state,
-        config.targetColors.map((c) => chroma(c)),
-      )
+      state,
+      config.targetColors.map((c) => chroma(c)),
+    )
     : 0;
   const avoidScore = config.avoidColors.length
     ? 100 -

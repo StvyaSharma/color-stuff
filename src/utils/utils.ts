@@ -3,7 +3,7 @@
  * Miscellaneous utility functions for the color library.
  */
 
-import { IColor } from "../core/color-operations.ts";
+import type { IColor } from "../core/color-operations.ts";
 
 /**
  * Clamps a number between min and max.

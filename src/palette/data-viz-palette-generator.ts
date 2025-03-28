@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Data Visualization Color Palette Generator Library
  *
@@ -20,8 +19,6 @@
  *
  * @module PaletteGenerator
  */
-
-import chroma from "chroma-js";
 
 /**
  * Represents a color in RGB format.
@@ -133,8 +130,8 @@ export function rgbToOkLab(rgb: RGB): OkLab {
 
   const L = 0.2104542553 * lCbrt + 0.793617785 * mCbrt - 0.0040720468 * sCbrt;
   const a = 1.9779984951 * lCbrt - 2.428592205 * mCbrt + 0.4505937099 * sCbrt;
-  const bVal =
-    0.0259040371 * lCbrt + 0.7827717662 * mCbrt - 0.808675766 * sCbrt;
+  const bVal = 0.0259040371 * lCbrt + 0.7827717662 * mCbrt -
+    0.808675766 * sCbrt;
   return { L, a, b: bVal };
 }
 
@@ -312,7 +309,7 @@ export function generatePalette(
     const warnings = checkAccessibility(bestCandidate);
 
     const distances = palette.map((color) =>
-      okLabDistance(color.okLab, bestCandidateOkLab!),
+      okLabDistance(color.okLab, bestCandidateOkLab!)
     );
 
     palette.push({
@@ -331,9 +328,11 @@ export function generatePalette(
         console.warn(
           `Warning: Color ${index + 1} and Color ${
             j + 1
-          } have a low OkLab distance (${d.toFixed(
-            2,
-          )}). May fail accessibility contrast guidelines.`,
+          } have a low OkLab distance (${
+            d.toFixed(
+              2,
+            )
+          }). May fail accessibility contrast guidelines.`,
         );
       }
     });
@@ -348,13 +347,19 @@ const palette = generatePalette(8, { samples: 8000, contrastThreshold: 20 });
 console.log("Generated Palette:");
 palette.forEach((color, idx) => {
   console.log(
-    `Color ${idx + 1}: ${color.hex} | OkLab: (${color.okLab.L.toFixed(
-      3,
-    )}, ${color.okLab.a.toFixed(3)}, ${color.okLab.b.toFixed(
-      3,
-    )}) | Accessibility Warnings: ${JSON.stringify(
-      color.accessibilityWarnings,
-    )}`,
+    `Color ${idx + 1}: ${color.hex} | OkLab: (${
+      color.okLab.L.toFixed(
+        3,
+      )
+    }, ${color.okLab.a.toFixed(3)}, ${
+      color.okLab.b.toFixed(
+        3,
+      )
+    }) | Accessibility Warnings: ${
+      JSON.stringify(
+        color.accessibilityWarnings,
+      )
+    }`,
   );
 });
 // }

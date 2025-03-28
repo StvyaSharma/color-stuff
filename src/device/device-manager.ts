@@ -4,7 +4,7 @@
  * device profile normalization, multi-format export, color appearance modeling.
  */
 
-import { IColor } from "../core/color-operations.ts";
+import type { IColor } from "../core/color-operations.ts";
 
 /**
  * Device profile interface

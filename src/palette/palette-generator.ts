@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Color Palette Generator Library
  * =================================

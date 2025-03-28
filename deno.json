@@ -1,5 +1,5 @@
 {
-  "name": "@stvya/color",
+  "name": "@stvya/color-stuff",
   "license": "MIT License",
   "version": "0.0.0",
   "exports": "./src/index.ts",

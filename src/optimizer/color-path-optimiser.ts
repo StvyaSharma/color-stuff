@@ -1,4 +1,3 @@
-// @ts-nocheck
 import chroma from "chroma-js";
 
 /**
@@ -97,8 +96,8 @@ function calculateGraphStatistics(graph: ColorGraph): {
 
   // Calculate standard deviation
   const squaredDiffs = distances.map((x) => Math.pow(x - mean, 2));
-  const variance =
-    squaredDiffs.reduce((sum, val) => sum + val) / distances.length;
+  const variance = squaredDiffs.reduce((sum, val) => sum + val) /
+    distances.length;
   const standardDeviation = Math.sqrt(variance);
 
   return { mean, standardDeviation };
@@ -135,8 +134,8 @@ function calculatePathFitness(path: string[], graph: ColorGraph): number {
   // Calculate mean and standard deviation of path distances
   const pathMean = distances.reduce((sum, val) => sum + val) / distances.length;
   const squaredDiffs = distances.map((x) => Math.pow(x - pathMean, 2));
-  const pathVariance =
-    squaredDiffs.reduce((sum, val) => sum + val) / distances.length;
+  const pathVariance = squaredDiffs.reduce((sum, val) => sum + val) /
+    distances.length;
   const pathStandardDeviation = Math.sqrt(pathVariance);
 
   // Return fitness score - lower values are better

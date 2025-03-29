@@ -3,14 +3,10 @@
  * Generates color palettes based on classical color harmony rules.
  */
 
-import { type HSL, type IColor, type Palette } from "../../core/color.types";
-import { fromIColor, toIColor } from "../../core/conversions";
-import { type HarmonyGeneratorOptions } from "../palette.types";
-import {
-  adjustBrightness,
-  adjustSaturation,
-  rotateHue,
-} from "../../core/operations";
+import chroma from "chroma-js";
+import type { HSL, IColor, Palette } from "../../core/color.types.ts";
+import { fromIColor, toIColor } from "../../core/conversions.ts";
+import type { HarmonyGeneratorOptions } from "../palette.types.ts";
 import {
   generateAnalogous,
   generateComplementary,
@@ -18,8 +14,8 @@ import {
   generateSquare, // Added square harmony rule
   generateTetradic, // Tetradic might be better named 'rectangular' sometimes
   generateTriadic,
-} from "../../harmony/rules"; // Use centralized harmony rules
-import { clamp } from "../../utils/math";
+} from "../../harmony/rules.ts"; // Use centralized harmony rules
+import { clamp } from "../../utils/math.ts";
 
 /**
  * Generates a palette based on a specified color harmony rule.
@@ -167,14 +163,22 @@ function adjustPaletteCount(
     // Interpolate to add more colors
     if (currentCount < 2) {
       // Cannot interpolate, duplicate the single color
-      return Array(targetCount).fill(currentPalette[0] || toIColor("black"));
+      // Ensure a default color if currentPalette[0] is somehow undefined
+      const fallbackColor = toIColor("black");
+      return Array(targetCount).fill(currentPalette[0] || fallbackColor);
     }
-    const scale = chroma.scale(currentPalette.map((c) => c.hex)).mode("lch")
-      .colors(targetCount);
-    return scale.map((hex) => toIColor(hex));
+    // Use chroma-js scale for interpolation
+    const scaleColors = chroma
+      .scale(currentPalette.map((c) => c.hex)) // Map IColor to hex strings
+      .mode("lch") // Use LCH color space for perceptually uniform interpolation
+      .colors(targetCount); // Generate the target number of hex colors
+
+    // Map the generated hex strings back to IColor objects
+    return scaleColors.map((hex: string) => toIColor(hex));
   } else {
     // Select a subset if too many colors were generated
-    // Simple slicing for now, could be smarter (e.g., select most distinct)
+    // Simple slicing preserves the original harmony colors first
+    // A more sophisticated approach might select colors based on perceptual distance
     return currentPalette.slice(0, targetCount);
   }
 }

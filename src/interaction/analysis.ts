@@ -2,9 +2,9 @@
  * @file interaction/analysis.ts
  * Functions for analyzing color palettes, such as calculating average color or vibe shift.
  */
-import chroma from "chroma-js";
-import type { IColor, Lab, Palette } from "../core/color.types";
-import { fromIColor, toIColor } from "../core/conversions";
+import type chroma from "chroma-js";
+import type { IColor, Lab, Palette } from "../core/color.types.ts";
+import type { fromIColor, toIColor } from "../core/conversions.ts";
 
 /**
  * Calculates the average color of a palette in Lab color space.

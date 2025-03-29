@@ -3,8 +3,8 @@
  * Handles color interpolation logic for gradients.
  */
 import chroma from "chroma-js";
-import type { IColor } from "../core/color.types";
-import { fromIColor, toIColor } from "../core/conversions";
+import type { IColor } from "../core/color.types.ts";
+import { fromIColor, toIColor } from "../core/conversions.ts";
 
 /**
  * Interpolates between two colors using chroma.js's mix function.

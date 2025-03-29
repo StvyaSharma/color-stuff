@@ -3,7 +3,7 @@
  * Functions for exporting colors or palettes into various common formats.
  */
 
-import type { IColor, Palette } from "../core/color.types";
+import type { IColor, Palette } from "../core/color.types.ts";
 
 /**
  * Represents the output formats for a single color.

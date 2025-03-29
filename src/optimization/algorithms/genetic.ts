@@ -2,9 +2,8 @@
  * @file optimization/algorithms/genetic.ts
  * Implements genetic algorithm variations for palette optimization and single color evolution.
  */
-import chroma from "chroma-js";
-import { type IColor, type Palette } from "../../core/color.types.ts";
-import { fromIColor, toIColor } from "../../core/conversions.ts";
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { toIColor } from "../../core/conversions.ts";
 import { colorDifference } from "../../core/operations.ts";
 import { clamp, randomInt } from "../../utils/math.ts";
 import { evaluatePaletteSolution } from "../fitness.ts"; // Centralized fitness function
@@ -174,8 +173,8 @@ function performCrossoverAndMutation(
       }
       case "shuffle": {
         if (paletteLength < 3) break;
-        let point1 = randomInt(0, paletteLength - 2);
-        let point2 = randomInt(point1 + 1, paletteLength - 1);
+        const point1 = randomInt(0, paletteLength - 2);
+        const point2 = randomInt(point1 + 1, paletteLength - 1);
         // Shuffle offspring1 section based on parent1
         const section1 = parent1.slice(point1, point2 + 1);
         for (let i = section1.length - 1; i > 0; i--) {
@@ -284,11 +283,11 @@ export function geneticCrossoverOptimization(
 
   const populationSize = initialSolution.length;
   let population: Individual<Palette>[] = initialSolution.map((palette) => ({
-    solution: palette.map((c) => ({ ...c })), // Deep copy
+    solution: palette.map((c: IColor) => ({ ...c })), // Deep copy
     fitness: evaluatePaletteSolution(primaryColor, palette),
   }));
 
-  let fitnessHistory: number[][] = [];
+  const fitnessHistory: number[][] = [];
   let iteration = 0;
   let bestOverallIndividual: Individual<Palette> | null = null;
 
@@ -299,14 +298,14 @@ export function geneticCrossoverOptimization(
       (isFinite(ind.fitness) && ind.fitness > bestOverallIndividual.fitness)
     ) {
       bestOverallIndividual = {
-        solution: ind.solution.map((c) => ({ ...c })),
+        solution: ind.solution.map((c: IColor) => ({ ...c })),
         fitness: ind.fitness,
       };
     }
   });
   if (!bestOverallIndividual) { // Handle case where initial pop had no valid fitness
     bestOverallIndividual = {
-      solution: population[0].solution.map((c) => ({ ...c })),
+      solution: population[0].solution.map((c: IColor) => ({ ...c })),
       fitness: -Infinity,
     };
   }
@@ -321,7 +320,7 @@ export function geneticCrossoverOptimization(
         isFinite(ind.fitness) && ind.fitness > bestOverallIndividual!.fitness
       ) {
         bestOverallIndividual = {
-          solution: ind.solution.map((c) => ({ ...c })),
+          solution: ind.solution.map((c: IColor) => ({ ...c })),
           fitness: ind.fitness,
         };
       }
@@ -348,7 +347,7 @@ export function geneticCrossoverOptimization(
       for (let i = 0; i < Math.min(elitismCount, populationSize); i++) {
         if (isFinite(population[i].fitness)) { // Only carry over valid individuals
           nextPopulationIndividuals.push({
-            solution: population[i].solution.map((c) => ({ ...c })),
+            solution: population[i].solution.map((c: IColor) => ({ ...c })),
             fitness: population[i].fitness,
           });
         }
@@ -399,16 +398,37 @@ export function geneticCrossoverOptimization(
       (!bestOverallIndividual || ind.fitness > bestOverallIndividual.fitness)
     ) {
       bestOverallIndividual = {
-        solution: ind.solution.map((c) => ({ ...c })),
+        solution: ind.solution.map((c: IColor) => ({ ...c })),
         fitness: ind.fitness,
       };
     }
   });
 
+  // Ensure bestOverallIndividual is not null before returning
+  // This case should theoretically be covered by the initial assignment,
+  // but it's good practice for type safety.
+  if (!bestOverallIndividual) {
+    // Find the best from the final population if somehow the loop didn't run or update it
+    population.sort((a, b) => b.fitness - a.fitness);
+    const bestFinal = population.find((ind) => isFinite(ind.fitness));
+    if (bestFinal) {
+      bestOverallIndividual = {
+        solution: bestFinal.solution.map((c: IColor) => ({ ...c })),
+        fitness: bestFinal.fitness,
+      };
+    } else {
+      // Fallback: return the first individual's solution even if fitness is bad
+      bestOverallIndividual = {
+        solution: population[0]?.solution.map((c: IColor) => ({ ...c })) || [],
+        fitness: population[0]?.fitness || -Infinity,
+      };
+    }
+  }
+
   return {
     population: population.map((ind) => ind.solution), // Return just the palettes
-    bestPalette: bestOverallIndividual!.solution,
-    bestFitness: bestOverallIndividual!.fitness,
+    bestPalette: bestOverallIndividual.solution,
+    bestFitness: bestOverallIndividual.fitness,
     iterations: iteration,
     fitnessHistory,
   };
@@ -477,7 +497,7 @@ export function evolveSingleColor(options: EvolveSingleColorOptions): IColor {
   // --- Selection (Roulette Wheel) ---
   const chooseParentIndex = (): number => {
     if (totalFitness <= 0) return randomInt(0, populationSize - 1);
-    let randomPick = Math.random() * totalFitness;
+    const randomPick = Math.random() * totalFitness;
     let currentSum = 0;
     for (let i = 0; i < populationSize; i++) {
       currentSum += population[i].fitness;

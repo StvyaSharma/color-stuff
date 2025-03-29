@@ -3,12 +3,11 @@
  * Generates palettes based on color interaction principles like relativity and subtraction.
  */
 
-import { type IColor, type Palette } from "../../core/color.types.ts";
-import { fromIColor, toIColor } from "../../core/conversions.ts";
-import { type InteractionGeneratorOptions } from "../palette.types.ts";
-import { perceivedColor, subtractColor } from "../../interaction/perceptual";
-import { adjustPaletteCount } from "./harmony_based"; // Reuse helper for count adjustment
-import { generateRandomColors as generateRandomHex } from "../../utils/misc"; // Utility for random hex
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { type fromIColor, toIColor } from "../../core/conversions.ts";
+import type { InteractionGeneratorOptions } from "../palette.types.ts";
+import { perceivedColor, subtractColor } from "../../interaction/perceptual.ts";
+import { generateRandomHexColor as generateRandomHex } from "../../utils/misc.ts"; // Utility for random hex
 
 /**
  * Generates a palette based on specified color interaction models.
@@ -111,15 +110,35 @@ function generateRelativityPalette(
   initialSurroundings: (IColor | string)[],
 ): Palette {
   const palette: Palette = [baseColor];
+  let surroundings: IColor[];
+
   // Use provided surroundings or generate random ones
-  const surroundings = initialSurroundings.length > 0
-    ? initialSurroundings.map((s) => toIColor(s))
-    : generateRandomHex(count > 1 ? count * 2 : 2).map((hex) => toIColor(hex)); // Generate more surroundings for variety
+  if (initialSurroundings.length > 0) {
+    surroundings = initialSurroundings.map((s) => toIColor(s));
+  } else {
+    surroundings = [];
+    // Generate count - 1 random surroundings, or maybe more for variety
+    const numSurroundingsToGenerate = count > 1 ? count * 2 : 2; // Generate more for variety
+    for (let i = 0; i < numSurroundingsToGenerate; i++) {
+      const randomHex = generateRandomHex(); // Assumes this returns one hex string
+      surroundings.push(toIColor(randomHex));
+    }
+  }
+
+  // Ensure there are surroundings if count > 1
+  if (count > 1 && surroundings.length === 0) {
+    // Generate at least one default random surrounding if none were provided or generated
+    surroundings.push(toIColor(generateRandomHex()));
+  }
 
   // Generate remaining colors by simulating perception with different surroundings
   for (let i = 1; i < count; i++) {
-    // Pick a surrounding color (can cycle or pick randomly)
-    const surrounding = surroundings[i % surroundings.length];
+    // Pick a surrounding color (cycle through the available surroundings)
+    // Ensure surroundings array is not empty before using modulo
+    const surrounding = surroundings.length > 0
+      ? surroundings[i % surroundings.length]
+      : baseColor; // Fallback, though ideally surroundings should always exist if count > 1
+
     // Calculate the perceived color of the base color when next to this surrounding color
     const perceived = perceivedColor(baseColor, [surrounding]); // Pass surrounding as array
     palette.push(perceived);

@@ -2,12 +2,12 @@
  * @file optimization/algorithms/hillclimbing.ts
  * Implements the Hill Climbing optimization algorithm for color palettes.
  */
-import chroma from "chroma-js";
-import { type IColor, type Palette } from "../../core/color.types";
-import { fromIColor, toIColor } from "../../core/conversions";
-import { clamp } from "../../utils/math";
-import { evaluatePaletteSolution } from "../fitness";
-import type { HillClimbingOptions, Move } from "../optimization.types";
+import type chroma from "chroma-js";
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { type fromIColor, toIColor } from "../../core/conversions.ts";
+import { clamp } from "../../utils/math.ts";
+import { evaluatePaletteSolution } from "../fitness.ts";
+import type { HillClimbingOptions, Move } from "../optimization.types.ts";
 
 /**
  * Generates neighboring palettes by slightly modifying one color channel
@@ -117,7 +117,7 @@ export function hillClimbingOptimization(options: HillClimbingOptions): {
     );
   }
 
-  let currentSolution: Palette = initialSolution.map((c) => ({ ...c })); // Start with a deep copy
+  let currentSolution: Palette = initialSolution.map((c: IColor) => ({ ...c })); // Start with a deep copy
   let currentFitness = evaluatePaletteSolution(primaryColor, currentSolution);
 
   if (!isFinite(currentFitness)) {
@@ -134,7 +134,7 @@ export function hillClimbingOptimization(options: HillClimbingOptions): {
   }
 
   let iterationsWithoutImprovement = 0;
-  let fitnessHistory: number[] = [currentFitness];
+  const fitnessHistory: number[] = [currentFitness]; // Use const as it's only modified, not reassigned
   let iteration = 0;
 
   for (; iteration < maxIterations; iteration++) {

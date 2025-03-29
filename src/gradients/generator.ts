@@ -4,20 +4,20 @@
  * using perceptually uniform color spaces and advanced interpolation.
  */
 
-import type { ColorInput, IColor, Palette } from "../core/color.types";
-import { fromIColor, toIColor } from "../core/conversions";
-import { colorDifference } from "../core/operations";
-import { interpolateColor } from "./interpolation";
-import { renderCssGradient, renderSvgGradient } from "./rendering";
+import type { ColorInput, IColor, Palette } from "../core/color.types.ts";
+import { type fromIColor, toIColor } from "../core/conversions.ts";
+import { colorDifference } from "../core/operations.ts";
+import { interpolateColor } from "./interpolation.ts";
+import { renderCssGradient, renderSvgGradient } from "./rendering.ts";
 import type {
   ColorStop,
   GradientMetadata,
   GradientOptions,
   GradientOutput,
   GradientType,
-} from "./gradient.types";
-import { SimplexNoise } from "../utils/noise"; // Assuming noise utils exist
-import { randomInt } from "../utils/math";
+} from "./gradient.types.ts";
+import { SimplexNoise } from "../utils/noise.ts"; // Assuming noise utils exist
+import type { randomInt } from "../utils/math.ts";
 
 /**
  * Base class for gradient generation. Handles common setup like color parsing.

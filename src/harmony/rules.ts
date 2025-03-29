@@ -4,8 +4,8 @@
  * These functions operate on IColor objects.
  */
 
-import type { IColor } from "../core/color.types";
-import { rotateHue } from "../core/operations";
+import type { IColor } from "../core/color.types.ts";
+import { rotateHue } from "../core/operations.ts";
 
 /**
  * Calculates the complementary color (180° hue rotation).

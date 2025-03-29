@@ -4,16 +4,10 @@
  * Uses OkLab distance and a greedy algorithm to maximize minimum separation.
  */
 
-import { type IColor, type Palette, type RGB } from "../../core/color.types";
-import {
-  fromIColor,
-  okLabDistance,
-  rgbToOkLab,
-  rgbTupleToHex,
-  toIColor,
-} from "../../core/conversions";
-import { type DataVizGeneratorOptions } from "../palette.types";
-import { colorDifference } from "../../core/operations"; // Uses DeltaE 2000
+import type { IColor, Palette, RGB } from "../../core/color.types.ts";
+import { toIColor } from "../../core/conversions.ts";
+import type { DataVizGeneratorOptions } from "../palette.types.ts";
+import { colorDifference } from "../../core/operations.ts"; // Uses DeltaE 2000
 
 /**
  * Generates a palette optimized for data visualization, aiming for maximum

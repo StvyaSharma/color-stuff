@@ -2,12 +2,12 @@
  * @file optimization/algorithms/simulatedannealing.ts
  * Implements the Simulated Annealing optimization algorithm for color palettes.
  */
-import chroma from "chroma-js";
-import { type IColor, type Palette } from "../../core/color.types";
-import { fromIColor, toIColor } from "../../core/conversions";
-import { clamp } from "../../utils/math";
-import { evaluatePaletteSolution } from "../fitness";
-import type { Move, SimulatedAnnealingOptions } from "../optimization.types";
+import type chroma from "chroma-js";
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { type fromIColor, toIColor } from "../../core/conversions.ts";
+import { clamp } from "../../utils/math.ts";
+import { evaluatePaletteSolution } from "../fitness.ts";
+import type { Move, SimulatedAnnealingOptions } from "../optimization.types.ts";
 
 /**
  * Generates possible neighboring moves by slightly modifying one color channel
@@ -114,7 +114,7 @@ export function simulatedAnnealingOptimization(
     );
   }
 
-  let currentSolution: Palette = initialSolution.map((c) => ({ ...c }));
+  let currentSolution: Palette = initialSolution.map((c: IColor) => ({ ...c }));
   let currentFitness = evaluatePaletteSolution(primaryColor, currentSolution);
 
   if (!isFinite(currentFitness)) {
@@ -130,16 +130,18 @@ export function simulatedAnnealingOptimization(
     };
   }
 
-  let bestSolution: Palette = initialSolution.map((c) => ({ ...c })); // Track the best solution encountered
+  let bestSolution: Palette = initialSolution.map((c: IColor) => ({ ...c })); // Track the best solution encountered
   let bestFitness = currentFitness;
 
   let temperature = initialTemperature;
-  let fitnessHistory: number[] = [currentFitness];
-  let temperatureHistory: number[] = [temperature];
+  const fitnessHistory: number[] = [currentFitness];
+  const temperatureHistory: number[] = [temperature];
   let iteration = 0;
 
   for (
-    ; iteration < maxIterations && temperature > minTemperature; iteration++
+    ;
+    iteration < maxIterations && temperature > minTemperature;
+    iteration++
   ) {
     const neighbourMoves = computeNeighbourMovesSA(
       currentSolution,
@@ -187,7 +189,7 @@ export function simulatedAnnealingOptimization(
       // Update the overall best solution if the current one is better
       if (currentFitness > bestFitness) {
         bestFitness = currentFitness;
-        bestSolution = currentSolution.map((c) => ({ ...c })); // Store a copy
+        bestSolution = currentSolution.map((c: IColor) => ({ ...c })); // Store a copy
       }
     }
     // If move not accepted, currentSolution and currentFitness remain unchanged

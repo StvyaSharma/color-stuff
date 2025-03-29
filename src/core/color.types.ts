@@ -2,7 +2,7 @@
  * @file core/color.types.ts
  * Defines core color interfaces used throughout the library.
  */
-import chroma from "chroma-js";
+import type chroma from "chroma-js";
 /**
  * Represents a color in RGB format (0-255).
  */

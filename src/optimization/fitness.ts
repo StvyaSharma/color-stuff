@@ -4,11 +4,10 @@
  * This function aims to capture desired aesthetic and accessibility properties.
  */
 
-import type { IColor, Palette } from "../core/color.types";
-import { calculateContrast, getContrastRatio } from "../accessibility/contrast"; // Use centralized contrast
-import { colorDifference } from "../core/operations"; // Use DeltaE 2000
-import { calculateLuminance } from "../core/operations"; // Use centralized luminance via operations->conversions
-import { fromIColor } from "../core/conversions";
+import type { IColor, Palette } from "../core/color.types.ts";
+import { getContrastRatio } from "../accessibility/contrast.ts"; // Use centralized contrast
+import { colorDifference } from "../core/operations.ts"; // Use DeltaE 2000
+import { fromIColor } from "../core/conversions.ts";
 
 /**
  * Evaluates a generated palette solution based on a primary color and other criteria.

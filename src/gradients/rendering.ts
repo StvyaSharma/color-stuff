@@ -3,8 +3,8 @@
  * Functions to render generated gradient steps into CSS or SVG formats.
  */
 
-import type { IColor } from "../core/color.types";
-import type { GradientOptions, GradientType } from "./gradient.types";
+import type { IColor } from "../core/color.types.ts";
+import type { GradientOptions, GradientType } from "./gradient.types.ts";
 
 /**
  * Creates a CSS gradient string from a list of color steps.

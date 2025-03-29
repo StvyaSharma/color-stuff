@@ -5,13 +5,13 @@
  * Uses a simple randomized optimization approach (similar to a basic genetic algorithm/hill climbing).
  */
 import chroma from "chroma-js";
-import {
-  type ColorEdge,
-  type ColorGraph,
-  type PathOptimizerOptions,
-} from "../optimization.types";
-import { randomInt } from "../../utils/math";
-import { shuffleArray } from "../../utils/array"; // Assuming shuffleArray exists in utils
+import type {
+  ColorEdge,
+  ColorGraph,
+  PathOptimizerOptions,
+} from "../optimization.types.ts";
+import { randomInt } from "../../utils/math.ts";
+import { shuffleArray } from "../../utils/array.ts"; // Assuming shuffleArray exists in utils
 
 /**
  * Builds a complete graph where nodes are colors and edges represent

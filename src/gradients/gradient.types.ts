@@ -2,7 +2,7 @@
  * @file gradients/gradient.types.ts
  * Defines types and interfaces related to gradient generation.
  */
-import type { ColorInput, IColor } from "../core/color.types";
+import type { ColorInput, IColor } from "../core/color.types.ts";
 
 /** Supported gradient types. */
 export type GradientType = "linear" | "radial" | "angular" | "blob";
@@ -14,26 +14,33 @@ export interface ColorStop {
   position?: number;
 }
 
+// --- BEGIN FIX ---
+// Define the specific color spaces supported by interpolateColor's 'mode' parameter
+export type InterpolationColorSpace =
+  | "lab"
+  | "lch"
+  | "oklab"
+  | "lrgb"
+  | "hsl"
+  | "rgb";
+// --- END FIX ---
+
 /** Options for controlling gradient interpolation. */
 export interface InterpolationOptions {
   /** The number of discrete color steps to generate in the output gradient. */
   steps: number;
   /**
-   * Interpolation mode affecting the rate of color change.
-   * 'linear': Constant rate.
-   * 'bezier': Uses bezier interpolation between stops (requires chroma >= 2.x).
-   * 'lab', 'lch', 'oklab': Interpolates in the specified color space. Defaults to 'lch'.
+   * Specifies the color space for interpolation.
+   * Defaults to 'lch'.
+   * ('linear' and 'bezier' are interpolation *methods/easings*, not color spaces,
+   * and should be handled separately if needed by the interpolation function).
    */
-  colorMode?:
-    | "linear"
-    | "bezier"
-    | "lab"
-    | "lch"
-    | "oklab"
-    | "lrgb"
-    | "hsl"
-    | "rgb"; // Extended options
+  // --- BEGIN FIX ---
+  colorMode?: InterpolationColorSpace; // Use the restricted type that interpolateColor accepts
+  // --- END FIX ---
   /**
+   * NOTE: 'linear' and 'bezier' removed from colorMode. If needed, add a separate
+   * 'easing' or 'interpolationMethod' option and update interpolateColor accordingly.
    * For 'bezier' mode, control points can be specified.
    * For other modes, could potentially be used for non-uniform step distribution (not standard chroma use).
    */

@@ -4,9 +4,9 @@
  * Note: These are highly simplified approximations.
  */
 import chroma from "chroma-js";
-import type { IColor } from "../core/color.types";
-import { fromIColor, toIColor } from "../core/conversions";
-import { clamp } from "../utils/math";
+import type { IColor, Palette } from "../core/color.types.ts";
+import { fromIColor, toIColor } from "../core/conversions.ts";
+import { clamp } from "../utils/math.ts";
 
 /**
  * Simulates the effect of light temperature (warm/cool) on a color.

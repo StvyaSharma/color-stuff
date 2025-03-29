@@ -4,7 +4,7 @@
  */
 
 import type { IColor } from "../core/color.types.ts";
-import Seedrandom from "seedrandom"; // For seeded shuffle
+import type Seedrandom from "seedrandom";
 
 /**
  * Randomly shuffles the elements of an array in place using the Fisher-Yates algorithm.

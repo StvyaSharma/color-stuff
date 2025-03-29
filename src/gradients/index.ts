@@ -3,7 +3,7 @@
  * Re-exports gradient generation types and functions.
  */
 
-export * from "./gradient.types";
-export * from "./generator"; // Exports the classes and the generateGradient function
-export * from "./interpolation";
-export * from "./rendering";
+export * from "./gradient.types.ts";
+export * from "./generator.ts";
+export * from "./interpolation.ts";
+export * from "./rendering.ts";

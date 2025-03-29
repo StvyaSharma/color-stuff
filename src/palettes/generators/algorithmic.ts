@@ -4,12 +4,12 @@
  * Adapted from the original `_asd.ts` file.
  */
 
-import { type IColor, type Palette } from "../../core/color.types.ts";
-import { fromIColor, rgbTupleToHex, toIColor } from "../../core/conversions.ts";
-import { type AlgorithmicGeneratorOptions } from "../palette.types.ts";
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { type fromIColor, type rgbTupleToHex, toIColor } from "../../core/conversions.ts";
+import type { AlgorithmicGeneratorOptions } from "../palette.types.ts";
 import { shuffleArray } from "../../utils/array.ts";
 import { SimplexNoise } from "../../utils/noise.ts"; // Use centralized noise utility
-import { randomInt } from "../../utils/math.ts";
+import type { randomInt } from "../../utils/math.ts";
 import Seedrandom from "seedrandom"; // Keep using Seedrandom for seeded generation
 import chroma from "chroma-js";
 import randomColor from "randomcolor"; // Keep dependency for this specific generator
@@ -363,7 +363,8 @@ export class AlgorithmicPaletteGenerator {
       luminosity: "random", // Example option
       hue: "random", // Example option
     });
-    return colorsHex.map((hex) => toIColor(hex || "#000000"));
+    // Explicitly type 'hex' as string to resolve implicit any
+    return colorsHex.map((hex: string) => toIColor(hex || "#000000"));
   }
 
   /**

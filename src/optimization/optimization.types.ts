@@ -2,7 +2,7 @@
  * @file optimization/optimization.types.ts
  * Defines common types used across different optimization algorithms.
  */
-import type { IColor, Palette } from "../core/color.types";
+import type { IColor, Palette } from "../core/color.types.ts";
 
 /**
  * Function signature for evaluating the fitness of a palette.

@@ -3,10 +3,10 @@
  * Generates simple random color palettes.
  */
 
-import { type IColor, type Palette } from "../../core/color.types";
-import { toIColor } from "../../core/conversions";
-import { type PaletteGeneratorOptions } from "../palette.types";
-import { generateRandomHexColor } from "../../utils/misc";
+import type { IColor, Palette } from "../../core/color.types.ts";
+import { toIColor } from "../../core/conversions.ts";
+import type { PaletteGeneratorOptions } from "../palette.types.ts";
+import { generateRandomHexColor } from "../../utils/misc.ts";
 
 /**
  * Generates a palette consisting of purely random colors.

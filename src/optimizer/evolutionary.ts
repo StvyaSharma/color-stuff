@@ -1,128 +1,198 @@
-interface RGB {
-  R: number;
-  G: number;
-  B: number;
-}
+import {
+  colorDifference,
+  fromIColor,
+  type IColor,
+  toIColor,
+} from "../core/color-operations.ts";
+import { clamp, randomInt } from "./utils.ts"; // Assuming clamp is in utils
+import chroma from "chroma-js";
 
-class Colour {
-  R: number;
-  G: number;
-  B: number;
+/** Represents an individual in the evolutionary population */
+interface ColorIndividual {
+  color: IColor;
   fitness: number;
-  private targetColor: RGB;
-
-  constructor(targetColor: RGB, R?: number, G?: number, B?: number) {
-    this.targetColor = targetColor;
-    this.R = (typeof R === "undefined") ? randomInt(0, 255) : R;
-    this.G = (typeof G === "undefined") ? randomInt(0, 255) : G;
-    this.B = (typeof B === "undefined") ? randomInt(0, 255) : B;
-    this.fitness = 0;
-    this.setFitness();
-  }
-
-  setFitness() {
-    const dR = this.R - this.targetColor.R;
-    const dG = this.G - this.targetColor.G;
-    const dB = this.B - this.targetColor.B;
-    const distance = Math.round(Math.sqrt(dR * dR + dG * dG + dB * dB));
-    this.fitness = Math.round((442 - distance) / 442 * 100);
-  }
 }
-
-const randomInt = (min: number, max: number): number =>
-  Math.floor(Math.random() * (max - min + 1) + min);
 
 const randomBool = (chance: number = 0.5): boolean => Math.random() < chance;
 
-export function evolveColor(targetColor: RGB, generations: number = 1000): RGB {
-  const population: Colour[] = [];
+/**
+ * Evolves a color towards a target color using a simple genetic algorithm approach.
+ *
+ * @param targetColor - The IColor object to evolve towards.
+ * @param populationSize - The number of individuals in the population.
+ * @param generations - The number of generations to run the evolution.
+ * @param mutationRate - The probability of a color channel mutating (0 to 1).
+ * @param mutationAmount - Max +/- change during mutation for RGB channels.
+ * @returns The IColor object from the final population with the highest fitness.
+ */
+export function evolveSingleColor(
+  targetColor: IColor,
+  populationSize: number = 100,
+  generations: number = 1000,
+  mutationRate: number = 0.05, // Increased mutation rate slightly
+  mutationAmount: number = 20, // Max change per mutation
+): IColor {
+  let population: ColorIndividual[] = [];
   let totalFitness = 0;
 
-  // Initialize population
-  for (let i = 0; i < 100; i++) {
-    population[i] = new Colour(targetColor);
-    totalFitness += population[i].fitness;
+  // --- Fitness Calculation ---
+  // Uses colorDifference (deltaE CIE76) from core operations.
+  // Lower difference = higher fitness. Max difference is sqrt(100^2 + 2*128^2) ~ 246
+  // Let's scale fitness from 0 to 100 where 100 is perfect match.
+  const calculateFitness = (individualColor: IColor): number => {
+    const diff = colorDifference(individualColor, targetColor);
+    const maxDiff = 250; // Approximate max deltaE
+    // Higher fitness for lower difference
+    const fitness = Math.max(0, 100 * (1 - diff / maxDiff));
+    return Math.round(fitness);
+  };
+
+  // --- Initialize Population ---
+  for (let i = 0; i < populationSize; i++) {
+    // Create random initial colors
+    const randomR = randomInt(0, 255);
+    const randomG = randomInt(0, 255);
+    const randomB = randomInt(0, 255);
+    const initialColor = toIColor(
+      chroma(randomR, randomG, randomB),
+    ); // Use chroma to create IColor
+
+    const fitness = calculateFitness(initialColor);
+    population[i] = { color: initialColor, fitness: fitness };
+    totalFitness += fitness;
   }
 
+  // --- Selection Functions (Fitness Proportionate Selection - Roulette Wheel) ---
   const chooseFit = (): number => {
-    let number = randomInt(0, totalFitness - 1);
-    for (let i = 0; i < 100; i++) {
-      if (population[i].fitness > number) {
+    if (totalFitness <= 0) return randomInt(0, populationSize - 1); // Handle zero fitness case
+    let number = Math.random() * totalFitness; // Use float for better distribution
+    for (let i = 0; i < populationSize; i++) {
+      if (population[i].fitness >= number) {
         return i;
-      } else {
-        number -= population[i].fitness;
       }
+      number -= population[i].fitness;
     }
-    return 0;
+    // Fallback in case of floating point issues
+    return populationSize - 1;
   };
 
+  // Choose weakest (inverse fitness proportionate)
   const chooseWeak = (): number => {
-    let number = randomInt(0, 9999 - totalFitness);
-    for (let i = 0; i < 100; i++) {
+    const maxPossibleFitnessSum = populationSize * 100;
+    const totalWeakness = maxPossibleFitnessSum - totalFitness;
+    if (totalWeakness <= 0) return randomInt(0, populationSize - 1); // All might be perfect
+
+    let number = Math.random() * totalWeakness;
+    for (let i = 0; i < populationSize; i++) {
       const weakness = 100 - population[i].fitness;
-      if (weakness > number) {
+      if (weakness >= number) {
         return i;
-      } else {
-        number -= weakness;
       }
+      number -= weakness;
     }
-    return 0;
+    // Fallback
+    return populationSize - 1;
   };
 
-  const mutate = (colour: Colour) => {
-    if (randomBool(0.01)) colour.R = randomInt(0, 255);
-    if (randomBool(0.01)) colour.G = randomInt(0, 255);
-    if (randomBool(0.01)) colour.B = randomInt(0, 255);
+  // --- Mutation Function ---
+  const mutate = (individual: ColorIndividual): ColorIndividual => {
+    let [r, g, b] = individual.color.rgb;
+    let changed = false;
+
+    if (randomBool(mutationRate)) {
+      r = clamp(r + randomInt(-mutationAmount, mutationAmount), 0, 255);
+      changed = true;
+    }
+    if (randomBool(mutationRate)) {
+      g = clamp(g + randomInt(-mutationAmount, mutationAmount), 0, 255);
+      changed = true;
+    }
+    if (randomBool(mutationRate)) {
+      b = clamp(b + randomInt(-mutationAmount, mutationAmount), 0, 255);
+      changed = true;
+    }
+
+    if (changed) {
+      const mutatedColor = toIColor(chroma(r, g, b));
+      const newFitness = calculateFitness(mutatedColor);
+      return { color: mutatedColor, fitness: newFitness };
+    }
+    return individual; // Return original if no mutation occurred
   };
 
-  const chooseParents = (): [Colour, Colour] => {
-    let parentId1 = 0;
-    let parentId2 = 0;
-    while (parentId1 === parentId2) {
-      parentId1 = chooseFit();
+  // --- Crossover (Breeding) Function ---
+  // Simple uniform crossover for RGB channels
+  const breed = (
+    parent1: ColorIndividual,
+    parent2: ColorIndividual,
+  ): ColorIndividual => {
+    const [r1, g1, b1] = parent1.color.rgb;
+    const [r2, g2, b2] = parent2.color.rgb;
+
+    const r = randomBool() ? r1 : r2;
+    const g = randomBool() ? g1 : g2;
+    const b = randomBool() ? b1 : b2;
+
+    const childColor = toIColor(chroma(r, g, b));
+    const fitness = calculateFitness(childColor);
+    return { color: childColor, fitness: fitness };
+  };
+
+  // --- Replacement Function ---
+  const replaceWeak = (child: ColorIndividual) => {
+    const weakId = chooseWeak();
+    if (weakId >= 0 && weakId < populationSize) {
+      const deceased = population[weakId];
+      totalFitness = totalFitness - deceased.fitness + child.fitness; // Update total fitness
+      population[weakId] = child;
+    } else {
+      console.warn("Invalid weakId selected:", weakId);
+    }
+  };
+
+  // --- Run Evolution ---
+  for (let generation = 0; generation < generations; generation++) {
+    // Check for convergence (optional)
+    const bestCurrentFitness = population.reduce(
+      (max, ind) => Math.max(max, ind.fitness),
+      0,
+    );
+    if (bestCurrentFitness >= 99) {
+      // console.log(`Converged early at generation ${generation}`);
+      break; // Stop if a very good match is found
+    }
+    if (totalFitness <= 0 && generation > 0) {
+      // console.log(`Population fitness collapsed at generation ${generation}`);
+      // Re-initialize part of the population if stuck? Or just break.
+      break;
+    }
+
+    // Select parents
+    let parentId1 = chooseFit();
+    let parentId2 = chooseFit();
+    // Ensure parents are different
+    while (parentId1 === parentId2 && populationSize > 1) {
       parentId2 = chooseFit();
     }
-    return [population[parentId1], population[parentId2]];
-  };
 
-  const breed = (parent1: Colour, parent2: Colour): Colour => {
-    const R = randomBool() ? parent1.R : parent2.R;
-    const G = randomBool() ? parent1.G : parent2.G;
-    const B = randomBool() ? parent1.B : parent2.B;
-    return new Colour(targetColor, R, G, B);
-  };
+    const parent1 = population[parentId1];
+    const parent2 = population[parentId2];
 
-  const replaceWeak = (child: Colour) => {
-    const weakId = chooseWeak();
-    const deceased = population[weakId];
-    totalFitness += child.fitness - deceased.fitness;
-    population[weakId] = child;
-  };
+    // Breed and mutate
+    const child = breed(parent1, parent2);
+    const mutatedChild = mutate(child); // Mutate the child
 
-  // Run evolution
-  for (let generation = 0; generation < generations; generation++) {
-    if (totalFitness === 10000) break;
-
-    const parents = chooseParents();
-    const child = breed(parents[0], parents[1]);
-    mutate(child);
-    replaceWeak(child);
+    // Replace a weak individual
+    replaceWeak(mutatedChild);
   }
 
-  // Return best result
-  let bestFitness = 0;
-  let bestColor = population[0];
-
-  population.forEach((color) => {
-    if (color.fitness > bestFitness) {
-      bestFitness = color.fitness;
-      bestColor = color;
+  // --- Return Best Result ---
+  let bestIndividual = population[0];
+  for (let i = 1; i < populationSize; i++) {
+    if (population[i].fitness > bestIndividual.fitness) {
+      bestIndividual = population[i];
     }
-  });
+  }
 
-  return {
-    R: bestColor.R,
-    G: bestColor.G,
-    B: bestColor.B,
-  };
+  return bestIndividual.color;
 }

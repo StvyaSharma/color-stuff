@@ -1,5 +1,5 @@
 /**
- * @file accessibilityChecker.ts
+ * @file accessibility-checker.ts
  * Implements WCAG 2.1 contrast checking, color vision deficiency simulation,
  * palette-wide accessibility validation, and automated color adjustment.
  */

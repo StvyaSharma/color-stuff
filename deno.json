@@ -8,6 +8,10 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
-    "chroma-js": "npm:chroma-js@^3.1.2"
+    "chroma-js": "npm:chroma-js@^3.1.2",
+    "hsluv": "npm:hsluv@^1.0.1",
+    "randomcolor": "npm:randomcolor@^0.6.2",
+    "seedrandom": "npm:seedrandom@^3.0.5",
+    "simplex-noise": "npm:simplex-noise@^4.0.3"
   }
 }
